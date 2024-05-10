@@ -22,8 +22,10 @@ function QuizApp() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const [secondsLeft, setSecondsLeft] = useState(TIMER);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     axios
       .get("https://jsonplaceholder.typicode.com/posts")
       .then((response: AxiosResponse<PostResponse[]>) => {
@@ -32,7 +34,8 @@ function QuizApp() {
           choices: q.body.split("\n").sort(() => Math.random() - 0.5),
         }));
         setQuestions(quizQuestions);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -64,6 +67,8 @@ function QuizApp() {
     setCurrentQuestion((prev) => prev + 1);
     setIsDisabled(true);
   };
+
+  if (isLoading) return;
 
   if (currentQuestion >= questions.length) {
     return (
